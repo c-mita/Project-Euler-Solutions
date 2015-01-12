@@ -19,12 +19,12 @@ Also included is a base.cpp file that includes the basic timing code in an other
 
 Tests are included for some of the generic code. They can be run in the same way as the solutions:
 
-More recent solutions will often begin with a comment block explaining the idea behind the solution.
-
 ```
 build.py peCalculationTest
 ./../bin/peCalculationTest
 ```
+
+More recent solutions will often begin with a comment block explaining the idea behind the solution.
 
 ###Reason for existence
 I got annoyed trawling through old Project Euler solutions looking for code I wanted to reuse.
