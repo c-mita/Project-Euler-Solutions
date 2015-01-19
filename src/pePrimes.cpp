@@ -31,3 +31,8 @@ const std::vector<int> PrimeFactorsList::operator[]( std::size_t index ) const {
     } while ( factor != 1 );
     return primeFactors;
 }
+
+int PrimeFactorsList::getLowestFactor( std::size_t index ) const {
+    if ( index >= static_cast<unsigned int>(size) ) throw;
+    return factors[index];
+}

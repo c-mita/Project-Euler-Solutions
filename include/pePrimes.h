@@ -146,6 +146,7 @@ public:
     ~PrimeFactorsList();
     const std::vector<int> operator[]( std::size_t index ) const;
     bool isPrime( int i ) const;
+    int getLowestFactor( std::size_t index ) const;
 private:
     std::vector<int> factors;
     int size;
