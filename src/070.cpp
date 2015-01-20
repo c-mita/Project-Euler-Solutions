@@ -24,7 +24,7 @@ int main() {
 
     int limit = 10000000;
     std::vector< std::pair<int, int> > results;
-    PrimeFactorsList primeFactors( limit );
+    PrimeFactorsList<int> primeFactors( limit );
     for ( int i = 1; i < limit; i++ ) {
         int totient = EulerTotient( primeFactors[i] );
         if ( Permutations( totient, i ) ) {

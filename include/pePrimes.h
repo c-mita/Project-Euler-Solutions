@@ -140,16 +140,48 @@ std::vector<T> generatePrimeList( T upper ) {
  * Gives prime factors for all numbers up to its length.
  * Calculated in sieve like fashion.
  */
+template<typename T>
 class PrimeFactorsList {
 public:
-    PrimeFactorsList( int length );
-    ~PrimeFactorsList();
-    const std::vector<int> operator[]( std::size_t index ) const;
-    bool isPrime( int i ) const;
-    int getLowestFactor( std::size_t index ) const;
+    PrimeFactorsList( std::size_t length ) {
+        size = length;
+        factors = std::vector<T>( size, 0 );
+        factors[1] = 1;
+        std::size_t n = 2;
+        do {
+            if ( factors[n] == 0 ) {
+                for ( std::size_t i = 1; i <= ( (size - 1) / n ); i++ ) {
+                    factors[i*n] = i;
+                }
+            }
+        } while ( n++ < size - 1 );
+    }
+
+    ~PrimeFactorsList() {}
+
+    const std::vector<T> operator[]( std::size_t index ) const {
+        if ( index >= size ) throw;
+        std::vector<T> primeFactors;
+        int factor = index;
+        do {
+            int nextFactor = factors[factor];
+            primeFactors.push_back( factor / nextFactor );
+            factor = nextFactor;
+        } while ( factor != 1 );
+        return primeFactors;
+    }
+
+    bool isPrime( T i ) const {
+        return factors[i] == 1;
+    }
+
+    int getLowestFactor( std::size_t index ) const {
+        if ( index >= size ) throw;
+        return factors[index];
+    }
 private:
-    std::vector<int> factors;
-    int size;
+    std::vector<T> factors;
+    std::size_t size;
 };
 
 #endif

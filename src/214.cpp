@@ -17,7 +17,7 @@ int main() {
     int exhaustiveLimit = 3000000; //don't calculate totient for all non-prime i, only below this limit
     std::vector<int> chainLengths( limit, 0 );
     long long int sum = 0;
-    PrimeFactorsList primeFactors( limit );
+    PrimeFactorsList<int> primeFactors( limit );
     std::cout << "Generated" << std::endl;
     for ( int i = 5; i < limit; i++ ) {
         if (i % 1000000 == 0) std::cout << i << std::endl;
