@@ -2,6 +2,7 @@
 #define PE_PRIMES_H
 
 #include <vector>
+#include <map>
 #include "peCalculation.h"
 
 /*
@@ -134,6 +135,33 @@ std::vector<T> generatePrimeList( T upper ) {
         i++;
     }
     return primes;
+}
+
+template<typename T, typename It = typename std::map<T, int>::iterator>
+inline void divisorsCalculation( std::map<T, int>& primeFactors,
+                          It currentElement,
+                          T currentResult,
+                          std::vector<T>* results ) {
+
+    if ( currentElement == primeFactors.end() ) {
+        results->push_back( currentResult );
+        return;
+    }
+    for ( int i = 0; i <= currentElement->second; i++ ) {
+        divisorsCalculation( primeFactors, ++currentElement, currentResult, results );
+        currentResult *= (--currentElement)->first;
+    }
+}
+
+template<typename T, typename It = typename std::vector<T>::const_iterator>
+inline std::vector<T> calculateAllDivisors( std::vector<T> primeFactors ) {
+    std::map<T, int> primes;
+    for ( It it = primeFactors.begin(); it != primeFactors.end(); ++it ) {
+        primes[*it]++;
+    }
+    std::vector<T> results;
+    divisorsCalculation( primes, primes.begin(), T(1), &results );
+    return results;
 }
 
 /*
