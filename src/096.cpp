@@ -18,7 +18,10 @@
  * eliminate that value from its peers (cells in the same row, column, or box)
  * and recurse, stepping back if no solution can be found.
  *
- * Project Euler grids can be solved in ~300ms (3.4Ghz i5)
+ * When eliminating options from peers, check for cells that only have a single possible value
+ * and allow this set/check process to recurse.
+ *
+ * Project Euler grids can be solved in ~20ms (3.4Ghz i5)
  */
 
 
@@ -37,6 +40,7 @@ static int example[SIZE] = {
 struct Cell {
     int value;
     int possibilities[10];
+    int num_possibilities;
 };
 
 class Grid {
@@ -47,6 +51,7 @@ public:
             cells[i].value = arr[i];
             memset( cells[i].possibilities, arr[i] ? 0 : 1, sizeof(cells[i].possibilities) );
             cells[i].possibilities[0] = 0;
+            cells[i].num_possibilities = 9;
         }
         for ( int i = 0; i < LENGTH; i++ ) {
             for ( int j = 0; j < LENGTH; j++ ) {
@@ -69,10 +74,30 @@ public:
         int idx = x + y * LENGTH;
         cells[idx].value = value;
         memset( cells[idx].possibilities, 0, sizeof(cells[idx].possibilities) );
+        cells[idx].num_possibilities = 0;
         Cell* peers[PEERS];
         getPeers( x, y, peers );
         for ( int k = 0; k < PEERS; k++ ) {
-            peers[k]->possibilities[value] = 0;
+            if ( peers[k]->possibilities[value] ) {
+                peers[k]->possibilities[value] = 0;
+                peers[k]->num_possibilities--;
+            }
+        }
+        clean();
+    }
+
+    void clean() {
+        for ( int i = 0; i < SIZE; i++ ) {
+            if ( cells[i].num_possibilities == 1 ) {
+                int value = 0;
+                for ( int k = 1; k < 10; k++ ) {
+                    if ( cells[i].possibilities[k] ) {
+                        value = k;
+                        break;
+                    }
+                }
+                setCellValue( i % LENGTH, i / LENGTH, value );
+            }
         }
     }
 
