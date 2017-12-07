@@ -14,9 +14,14 @@ const int C_LIMIT = 50000;
  * we slice through the z-axis, considering rectangles in the x-y plane only.
  *
  * The finding of intersections is still really dumb and can likely be improved.
+ * We intersect all pairs of rectangles, then iteratively intersect those to
+ * get all 3-tuple intersections, and so on.
+ * We keep track of what rectangles "make up" an intersection, discarding those
+ * intersections that have the "wrong number" of parents (so A^B ^ C^D isn't
+ * counted as a 3-tuple). We also have to discard duplicate intersections.
  *
- * Runtime ~400 seconds (6-7 minutes).
- * Quite a way to go for the 1 minute mark.
+ * Runtime ~90 seconds (1.5 minutes).
+ * Needs Improvement to get to the one minute mark.
  */
 
 struct line_seg {
@@ -58,63 +63,43 @@ std::vector<cuboid> create_cuboids(const std::vector<int>& lfg) {
     return cuboids;
 }
 
-std::vector<cuboid> eliminate_swallowed_xy_rects(const std::vector<cuboid>& cuboids) {
-    std::vector<cuboid> rects;
-    rects.reserve(cuboids.size());
-
-    for (auto c1 = cuboids.begin(); c1 != cuboids.end(); ++c1) {
-        for (auto c2 = cuboids.begin(); c2 != cuboids.end(); ++c2) {
-            if (c1 == c2) continue;
-            if (c1->sx.start >= c2->sx.start && c1->sx.end <= c2->sx.end
-                    && c1->sy.start >= c2->sy.start && c1->sy.end <= c2->sy.end) {
-                goto FULLY_CONTAINED;
-            }
-        }
-        rects.push_back(*c1);
-    FULLY_CONTAINED:;
-    }
-    return rects;
-}
-
-
 std::tuple<std::vector<cuboid>, std::vector<std::unordered_set<int>>>
-find_xy_intersections(std::vector<cuboid>& cuboids,
-        std::vector<cuboid>& intersections,
-        std::vector<std::unordered_set<int>> components) {
-    // a really dumb search that'll generate duplicate intersections that have to be pruned afterwards
-    // e.g. suppose rectangle A is being intersected with B^C, giving A^B^C
-    // well B will also be intersected with A^C, to give B^A^C - we have to filter out one of these
-    int idx = 0;
-    std::vector<cuboid> new_intersections;
+find_xy_intersections(std::vector<cuboid>& rects, std::vector<std::unordered_set<int>> components) {
+    std::vector<cuboid> intersections;
     std::vector<std::unordered_set<int>> new_components;
-    for (auto r1 : cuboids) {
-        auto it = intersections.begin();
-        auto cit = components.begin();
-        for (; it != intersections.end() && cit != components.end(); ++it, ++cit) {
-            if (cit->count(idx)) continue;
-            auto r2 = *it;
-            int x_start = std::max(r1.sx.start, r2.sx.start);
-            int x_end = std::min(r1.sx.end, r2.sx.end);
+    // dumb quadratic intersection algorithm, discarding intersections with the "wrong number" of intersections
+    if (components.size() == 0) return std::make_tuple(intersections, new_components);
+    std::size_t n_components = components[0].size() + 1;
+    auto c = components.begin();
+    int i = 0;
+    for (auto r1 = rects.begin(); r1 != rects.end() && c != components.end(); ++r1, ++c, ++i) {
+        int j = i + 1;
+        for (auto r2 = r1 + 1; r2 != rects.end(); ++r2, ++j) {
+            int x_start = std::max(r1->sx.start, r2->sx.start);
+            int x_end = std::min(r1->sx.end, r2->sx.end);
             if (x_end < x_start) continue;
-            int y_start = std::max(r1.sy.start, r2.sy.start);
-            int y_end = std::min(r1.sy.end, r2.sy.end);
+            int y_start = std::max(r1->sy.start, r2->sy.start);
+            int y_end = std::min(r1->sy.end, r2->sy.end);
             if (y_end < y_start) continue;
             line_seg sx = {x_start, x_end}, sy = {y_start, y_end}, sz = {0, 1};
-            new_intersections.push_back({sx, sy, sz});
-            auto c = *cit;
-            c.insert(idx);
-            new_components.push_back(c);
+            std::unordered_set<int> c_new = components[i];
+            c_new.insert(components[j].begin(), components[j].end());
+            if (c_new.size() == n_components) {
+                intersections.push_back({sx, sy, sz});
+                new_components.push_back(c_new);
+            }
         }
-        idx++;
     }
+
+    // filter out duplicate intersections
     std::vector<cuboid> deduped_intersections;
     std::vector<std::unordered_set<int>> deduped_components;
-    for (std::size_t i = 0; i < new_components.size(); i++) {
-        for (std::size_t j = i + 1; j < new_components.size(); j++) {
+    for (int i = 0; i < new_components.size(); i++) {
+        for (int j = i + 1; j < new_components.size(); j++) {
             if (new_components[i] == new_components[j]) goto NEXT_ITEM;
         }
         deduped_components.push_back(new_components[i]);
-        deduped_intersections.push_back(new_intersections[i]);
+        deduped_intersections.push_back(intersections[i]);
 NEXT_ITEM:;
     }
     return std::make_tuple(deduped_intersections, deduped_components);
@@ -127,7 +112,6 @@ long long int combined_area(std::vector<cuboid> cuboids) {
         auto end_it = std::copy_if(cuboids.begin(), cuboids.end(), rects.begin(),
                 [z_level](cuboid& c) {return c.sz.start <= z_level && z_level < c.sz.end;});
         rects.resize(std::distance(rects.begin(), end_it));
-        rects = eliminate_swallowed_xy_rects(rects);
         auto intersections = rects;
         std::vector<std::unordered_set<int>> components;
         components.reserve(rects.size());
@@ -141,9 +125,9 @@ long long int combined_area(std::vector<cuboid> cuboids) {
             }
             sum += area * include_exclude_factor;
             include_exclude_factor *= -1;
-            std::tie(intersections, components) = find_xy_intersections(rects, intersections, components);
+            std::tie(intersections, components) = find_xy_intersections(intersections, components);
         }
-        if (z_level % 500 == 0) std::cout << "At level: " << z_level << std::endl;
+        if (z_level % 500 == 0) std::cout << "At level: " << z_level << ", Current volume: " << sum << std::endl;
     }
     return sum;
 }
