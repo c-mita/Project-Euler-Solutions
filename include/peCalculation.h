@@ -17,6 +17,28 @@ T ModularExp( T base, T exp, T mod ) {
 }
 
 template<typename T>
+T ModularInv( T a, T mod ) {
+    // returns zero if not invertible
+    // based on extended euclidean algorithm
+    // see https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
+    T t = 0, next_t = 1;
+    T r = mod, next_r = a;
+    while ( next_r != 0 ) {
+        T q = r / next_r;
+        T temp = t - q * next_t;
+        t = next_t;
+        next_t = temp;
+
+        temp = r - q * next_r;
+        r = next_r;
+        next_r = temp;
+    }
+    if ( r > 1 ) return 0;
+    if ( t < 0 ) t += mod;
+    return t;
+}
+
+template<typename T>
 void integerDivision( const T& numerator, const T& denominator, T* quotient, T* remainder ) {
     if ( denominator == 0 ) throw std::domain_error("Division by zero");
     T num = numerator;
