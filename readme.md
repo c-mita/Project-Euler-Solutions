@@ -36,5 +36,3 @@ So I decided to move to working out of a single repository with frequently used 
 Not all of my Project Euler solutions are included.
 Many were solved in a different language or the code has been lost to the ages (my first PE problem was solved at school in 2008).
 Many others have simply not been converted to use the new templated code in the header files.
-
-(Some aspects of the code are of questionable quality - I'm looking at you peLargeInts.h).
