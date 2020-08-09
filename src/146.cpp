@@ -1,9 +1,10 @@
 #include <iostream>
 #include <chrono>
+#include <boost/multiprecision/cpp_int.hpp>
 #include "pePrimes.h"
-#include "peLargeInts.h"
 
 typedef unsigned long long int uLongInt;
+typedef boost::multiprecision::cpp_int bigint;
 
 /*
  * Sum of n for n < 150 million and
@@ -54,13 +55,13 @@ int main() {
         for ( auto jt = additions.begin(); jt != additions.end(); ++jt ) {
             uLongInt r = n * n + *jt;
             //if ( !isPrime( r ) ) goto CHECK_FAILURE;
-            bool isPrime = isMrPrime< DoubleUInt<uLongInt>, uLongInt >( DoubleUInt<uLongInt>( r ) );
+            bool isPrime = isMrPrime<bigint, uLongInt>( bigint(r) );
             if ( !isPrime ) goto CHECK_FAILURE;
         }
         for ( auto jt = nonAdditions.begin(); jt != nonAdditions.end(); ++jt ) {
             uLongInt r = n * n + *jt;
             //if ( isPrime( r ) ) goto CHECK_FAILURE;
-            bool isPrime = isMrPrime< DoubleUInt<uLongInt>, uLongInt >( DoubleUInt<uLongInt>( r ) );
+            bool isPrime = isMrPrime<bigint, uLongInt>( bigint(r) );
             if ( isPrime ) goto CHECK_FAILURE;
         }
         std::cout << n << std::endl;
