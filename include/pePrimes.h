@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <stdexcept>
 #include "peCalculation.h"
 
 /*
@@ -188,7 +189,7 @@ public:
     ~PrimeFactorsList() {}
 
     const std::vector<T> operator[]( std::size_t index ) const {
-        if ( index >= size ) throw;
+        if ( index >= size ) throw std::out_of_range("Index out of range");
         std::vector<T> primeFactors;
         int factor = index;
         do {
@@ -204,7 +205,7 @@ public:
     }
 
     int getLowestFactor( std::size_t index ) const {
-        if ( index >= size ) throw;
+        if ( index >= size ) throw std::out_of_range("Index out of range");
         return factors[index];
     }
 private:
