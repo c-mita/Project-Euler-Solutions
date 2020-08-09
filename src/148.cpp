@@ -1,5 +1,4 @@
-#include <iostream>
-#include <chrono>
+#include "main.h"
 
 /*
  * Problem 148
@@ -38,9 +37,7 @@ int* getRepresentation( int n, int base, int* buffer ) {
     return buffer;
 }
 
-int main() {
-    auto startTime = std::chrono::steady_clock::now();
-
+std::string solution() {
     int prime = 7;
     int limit = 1000000000;
     int buffer[11];
@@ -54,15 +51,7 @@ int main() {
         }
 
         sum += rowSum;
-        if ( n % 1000000 == 0 ) std::cout << n << std::endl;
     }
 
-
-    std::cout << "Answer: " << sum << std::endl;
-
-    auto endTime = std::chrono::steady_clock::now();
-    auto runTime = endTime - startTime;
-    std::cout << "Time: " << std::chrono::duration<double, std::milli> (runTime).count() << " ms" << std::endl;
-
-    return 0;
+    return std::to_string(sum);
 }

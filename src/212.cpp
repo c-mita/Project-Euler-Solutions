@@ -1,11 +1,11 @@
 #include <iostream>
-#include <chrono>
 #include <vector>
 #include <tuple>
 #include <algorithm>
 #include <cstdlib>
 #include <unordered_set>
 #include <set>
+#include "main.h"
 
 const int C_LIMIT = 50000;
 
@@ -302,18 +302,10 @@ std::vector<cuboid> create_cuboids(const std::vector<int>& lfg) {
     return cuboids;
 }
 
-int main() {
-    auto startTime = std::chrono::steady_clock::now();
-
+std::string solution() {
     auto lfg = create_lfg(C_LIMIT * 6);
     std::vector<cuboid> cuboids = create_cuboids(lfg);
 
     long long int area = combined_area(cuboids);
-    std::cout << area << std::endl;
-
-    auto endTime = std::chrono::steady_clock::now();
-    auto runTime = endTime - startTime;
-    std::cout << "Time: " << std::chrono::duration<double, std::milli> (runTime).count() << " ms" << std::endl;
-
-    return 0;
+    return std::to_string(area);
 }

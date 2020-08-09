@@ -1,6 +1,5 @@
-#include <iostream>
-#include <chrono>
 #include <cmath>
+#include "main.h"
 
 // http://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Continued_fraction_expansion
 int calculatePeriod( int n ) {
@@ -17,19 +16,11 @@ int calculatePeriod( int n ) {
     return period;
 }
 
-int main() {
-    auto startTime = std::chrono::steady_clock::now();
-
+std::string solution() {
     int result = 0;
     for ( int n = 2; n <= 10000; n++ ) {
         if ( calculatePeriod( n ) % 2 != 0 ) result++;
     }
 
-    std::cout << "Answer: " << result << std::endl;
-
-    auto endTime = std::chrono::steady_clock::now();
-    auto runTime = endTime - startTime;
-    std::cout << "Time: " << std::chrono::duration<double, std::milli> (runTime).count() << " ms" << std::endl;
-
-    return 0;
+    return std::to_string(result);
 }

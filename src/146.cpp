@@ -1,6 +1,5 @@
-#include <iostream>
-#include <chrono>
 #include <boost/multiprecision/cpp_int.hpp>
+#include "main.h"
 #include "pePrimes.h"
 
 typedef unsigned long long int uLongInt;
@@ -25,9 +24,7 @@ typedef boost::multiprecision::cpp_int bigint;
  * Runtime ~3sec 3.4GHz i5
  */
 
-int main() {
-    auto startTime = std::chrono::steady_clock::now();
-
+std::string solution() {
     int limit = 150000000;
     int initialPrimeCount = 1000000;
     std::vector<int> additions { 1, 3, 7, 9, 13, 27 };
@@ -64,16 +61,9 @@ int main() {
             bool isPrime = isMrPrime<bigint, uLongInt>( bigint(r) );
             if ( isPrime ) goto CHECK_FAILURE;
         }
-        std::cout << n << std::endl;
         sum += n;
     CHECK_FAILURE:;
     }
 
-    std::cout << "Sum: " << sum << std::endl;
-
-    auto endTime = std::chrono::steady_clock::now();
-    auto runTime = endTime - startTime;
-    std::cout << "Time: " << std::chrono::duration<double, std::milli> (runTime).count() << " ms" << std::endl;
-
-    return 0;
+    return std::to_string(sum);
 }

@@ -1,9 +1,9 @@
-#include <iostream>
 #include <chrono>
 #include <cstring>
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include "main.h"
 
 #define LENGTH 9
 #define SIZE 81
@@ -277,9 +277,7 @@ parseGrids( const char* path ) {
     return grids;
 }
 
-int main( int argc, char* argv[] ) {
-    auto startTime = std::chrono::steady_clock::now();
-
+std::string solution() {
     calcUnitArr( UNIT_SET );
 
     for ( int i = 0; i < LENGTH; i++ ) {
@@ -287,14 +285,7 @@ int main( int argc, char* argv[] ) {
             calcPeers(i, j, &PEER_SET[PEERS * (i + j * LENGTH)]);
         }
     }
-
-    const char* filePath;
-    if ( argc <= 1 ) {
-        filePath = INPUT_FILE;
-    } else {
-        filePath = argv[1];
-    }
-    std::vector< std::vector<int> > grids = parseGrids( filePath );
+    std::vector< std::vector<int> > grids = parseGrids( INPUT_FILE );
 
     Grid out;
     int sum = 0;
@@ -317,11 +308,5 @@ int main( int argc, char* argv[] ) {
         sum += n;
     }
 
-    std::cout << "Answer: " << sum << std::endl;
-
-    auto endTime = std::chrono::steady_clock::now();
-    auto runTime = endTime - startTime;
-    std::cout << "Time: " << std::chrono::duration<double, std::milli> (runTime).count() << " ms" << std::endl;
-
-    return 0;
+    return std::to_string(sum);
 }

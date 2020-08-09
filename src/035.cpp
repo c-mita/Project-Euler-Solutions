@@ -1,5 +1,4 @@
-#include <iostream>
-#include <chrono>
+#include "main.h"
 #include "pePrimes.h"
 
 int nextCycle( int n, int length ) {
@@ -10,14 +9,12 @@ int nextCycle( int n, int length ) {
     return n;
 }
 
-int main() {
-    auto startTime = std::chrono::steady_clock::now();
+std::string solution() {
     int limit = 1000000;
 
     int cycleCount = 0;
     std::vector<bool> primes = generatePrimalityTable( limit );
     std::vector<bool> checked( limit, false );
-    std::cout << primes[119] << std::endl;
     for ( int p = 2; p < limit; p++ ) {
         if ( !primes[p] || checked[p] ) continue;
         int prime = p;
@@ -50,14 +47,7 @@ int main() {
             if ( checked[prime] ) break;
         }
         cycleCount += isCycle ? cycleLength : 0;
-        if (isCycle) std::cout << prime << std::endl;
     }
 
-    std::cout << "Answer: " << cycleCount << std::endl;
-
-    auto endTime = std::chrono::steady_clock::now();
-    auto runTime = endTime - startTime;
-    std::cout << "Time: " << std::chrono::duration<double, std::milli> (runTime).count() << " ms" << std::endl;
-
-    return 0;
+    return std::to_string(cycleCount);
 }

@@ -1,7 +1,7 @@
-#include <iostream>
-#include <chrono>
 #include <array>
 #include <cmath>
+#include <sstream>
+#include "main.h"
 #include "peCombinations.h"
 #include "pePermutations.h"
 
@@ -75,9 +75,7 @@ int calculateScore( bool* valuesReached ) {
     return score;
 }
 
-int main() {
-    auto startTime = std::chrono::steady_clock::now();
-
+std::string solution() {
     std::array< operatorset_t, 64 > operationCombinations = generateOperatorCombinations();
     int combination[4] = {1, 2, 3, 4};
     int bestLength = 0;
@@ -112,11 +110,7 @@ int main() {
         }
     } while ( nextSeqNumericCombination( combination, 4, 9 ) );
 
-    std::cout << "Set: " << winners[0] << winners[1] << winners[2] << winners[3] << std::endl;
-    std::cout << "Length: " << bestLength << std::endl;
-
-    auto endTime = std::chrono::steady_clock::now();
-    auto runTime = endTime - startTime;
-    std::cout << "Time: " << std::chrono::duration<double, std::milli> (runTime).count() << " ms" << std::endl;
-    return 0;
+    std::stringstream s;
+    s << winners[0] << winners[1] << winners[2] << winners[3];
+    return s.str();
 }

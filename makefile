@@ -1,7 +1,8 @@
-BIN_DIR ?= ./bin
-SRC_DIR = ./src
-INC_DIR = ./include
-DEP_DIR = ./deps
+BIN_DIR ?= bin
+SRC_DIR = src
+INC_DIR = include
+DATA_DIR = data
+DEP_DIR = deps
 
 SRC_FILES := $(shell find $(SRC_DIR) -name '*.cpp')
 DEP_FILES := $(SRC_FILES:$(SRC_DIR)/%.cpp=$(DEP_DIR)/%.d)
@@ -29,12 +30,19 @@ $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
 #
+# Link data file to bin dir
+#
+$(BIN_DIR)/%.txt: $(DATA_DIR)/%.txt | $(BIN_DIR)
+	echo $@
+	ln -sf $$(readlink -f $<) $@
+
+#
 # Compilation
 #
 $(BIN_DIR)/066: $(SRC_DIR)/066.cpp $(INC_DIR)/* $(DEP_DIR)/066.d | $(BIN_DIR) $(DEP_DIR)
 	$(CC) $(CFLAGS) $< -o $@ -lgmp
 
-$(BIN_DIR)/146: $(SRC_DIR)/146.cpp $(INC_DIR)/* $(DEP_DIR)/146.d | $(BIN_DIR) $(DEP_DIR)
+$(BIN_DIR)/096: $(SRC_DIR)/096.cpp $(INC_DIR)/* $(DEP_DIR)/096.d | $(BIN_DIR) $(DEP_DIR) $(BIN_DIR)/096.txt
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BIN_DIR)/%: $(SRC_DIR)/%.cpp $(DEP_DIR)/%.d | $(BIN_DIR) $(DEP_DIR)

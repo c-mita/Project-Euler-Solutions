@@ -1,6 +1,5 @@
-#include <iostream>
-#include <chrono>
 #include <stdexcept>
+#include "main.h"
 #include "peCalculation.h"
 #include "pePrimes.h"
 
@@ -28,9 +27,7 @@ int power_of_ten(int target) {
     return t;
 }
 
-int main() {
-    auto startTime = std::chrono::steady_clock::now();
-
+std::string solution() {
     long long int sum = 0;
     auto primes = generatePrimeList<int>(LIMIT + 100);
     for (auto p1_it = primes.begin() + 2, p2_it = primes.begin() + 3;
@@ -43,10 +40,5 @@ int main() {
         long long int k = ((long long int) inv * (long long int) (p2 - p1) % p2);
         sum += k * ten_d + p1;
     }
-    std::cout << sum << std::endl;
-
-    auto endTime = std::chrono::steady_clock::now();
-    auto runTime = endTime - startTime;
-    std::cout << "Time: " << std::chrono::duration<double, std::milli> (runTime).count() << " ms" << std::endl;
-    return 0;
+    return std::to_string(sum);
 }

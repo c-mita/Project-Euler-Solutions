@@ -1,5 +1,4 @@
-#include <iostream>
-#include <chrono>
+#include "main.h"
 #include "pePrimes.h"
 #include "pePermutations.h"
 
@@ -19,20 +18,12 @@ int checkPartitions( int start, int prev, int* perms ) {
     return count;
 }
 
-int main() {
-    auto startTime = std::chrono::steady_clock::now();
-
+std::string solution() {
     int count = 0;
     int perms[9] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     do {
         count += checkPartitions( 0, 0, perms );
     } while ( nextLexicalPermutation( perms, 9 ) );
 
-    std::cout << count << std::endl;
-
-    auto endTime = std::chrono::steady_clock::now();
-    auto runTime = endTime - startTime;
-    std::cout << "Time: " << std::chrono::duration<double, std::milli> (runTime).count() << " ms" << std::endl;
-
-    return 0;
+    return std::to_string(count);
 }

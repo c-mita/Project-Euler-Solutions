@@ -1,9 +1,8 @@
-#include <iostream>
-#include <chrono>
 #include <tuple>
 #include <math.h>
 #include <stdexcept>
 #include <gmpxx.h>
+#include "main.h"
 
 /*
  * http://www.isibang.ac.in/~sury/chakravala.pdf
@@ -41,9 +40,7 @@ chak_method(int n) {
     return std::make_tuple(p, q);
 }
 
-int main() {
-    auto start_time = std::chrono::steady_clock::now();
-
+std::string solution() {
     int limit = 1000;
     bigint_t max_x = 0;
     int max_i = 0;
@@ -57,12 +54,5 @@ int main() {
             max_i = i;
         }
     }
-    std::cout << max_i << std::endl;
-    std::cout << max_x.get_str() << std::endl;
-
-    auto end_time = std::chrono::steady_clock::now();
-    auto run_time = end_time - start_time;
-    std::cout << "Time: " << std::chrono::duration<double, std::milli> (run_time).count() << " ms" << std::endl;
-    return 0;
-
+    return std::to_string(max_i);
 }

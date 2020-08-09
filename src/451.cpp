@@ -1,6 +1,5 @@
-#include <iostream>
-#include <chrono>
 #include <algorithm>
+#include "main.h"
 #include "pePrimes.h"
 
 
@@ -20,8 +19,8 @@
  *
  * Still a way off that < 60 second mark
  */
-int main() {
-    auto startTime = std::chrono::steady_clock::now();
+
+std::string solution() {
 
     int limit = 20000000;
     std::vector<long long int> records( limit + 1, 1 );
@@ -45,11 +44,5 @@ int main() {
         sum += *it;
     }
 
-    std::cout << "Answer: " << sum << std::endl;
-
-    auto endTime = std::chrono::steady_clock::now();
-    auto runTime = endTime - startTime;
-    std::cout << "Time: " << std::chrono::duration<double, std::milli> (runTime).count() << " ms" << std::endl;
-
-    return 0;
+    return std::to_string(sum);
 }
