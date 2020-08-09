@@ -1,58 +1,74 @@
 #include <iostream>
 #include <chrono>
-#include <vector>
 #include "pePrimes.h"
 #include "peLargeInts.h"
 
-typedef unsigned long long int longint;
-typedef DoubleUInt< longint > veryLongInt;
+typedef unsigned long long int uLongInt;
 
 /*
  * Sum of n for n < 150 million and
  * n^2 + d are consecutive primes for
  * d in {1, 3, 7, 9, 13, 27}
+
+ * Write n as n = p * x + r for prime p
+ * Then n^2 + d = p^2 * x^2 + 2pxr + r^2 + d
+ * q | (r^2 + d) iff q | (n^2 + d)
+ * q | (n^2 +d) only if q | ((n%q)^2 + d)
  *
- * Can see n must be even for n^2 + d
- * to be prime.
- * Considering modulo 5, we see n = 0 mod 5
- * Other values fail.
- * Similarly n != 0 mod 3 and n != 0 mod 7
- * (other values fail for 7, but we skip them)
+ * Since we don't want q to divide r^2 + d
+ * (we want (n^2 + d) to be prime)
+ * we can filter out candidates for n by
+ * checking for this relationship against
+ * various primes (say p < 1 million)
  *
- * We must also check for prime "gaps" since they
- * must be consecutive.
- * d in {5, 15, 25} obviously fails.
- * Since n^2 = 1 mod 3 (n = 1 or 2 mod 3) and
- * 11, 17, 23 = 2 mod 3, we can rule them out.
- * So only {19, 21} need to be checked that they
- * don't produce primes.
- *
- * Runtime ~35-40 minutes 3.4GHz i5
+ * Runtime ~3sec 3.4GHz i5
  */
+
 int main() {
     auto startTime = std::chrono::steady_clock::now();
 
     int limit = 150000000;
-    std::vector<int> addToPrime { 1, 3, 7, 9, 13, 27 };
-    std::vector<int> addToNonPrime { 19, 21 };
-    int skip3 = 0, skip7 = 0;
+    int initialPrimeCount = 1000000;
+    std::vector<int> additions { 1, 3, 7, 9, 13, 27 };
+    std::vector<int> nonAdditions { 19, 21 };
+    std::vector<int> primes = generatePrimeList<int>( initialPrimeCount );
+    std::vector<int> candidatePrimes;
     int sum = 0;
-    for ( longint n = 0; n < limit; n += 10 ) {
-        //note bitwise or - both sides must evaluate
-        if ( (skip3++ % 3 == 0) | (skip7++ % 7 == 0) ) continue;
-        longint k = n * n;
-        for ( auto it = addToPrime.begin(); it != addToPrime.end(); ++it ) {
-           if ( !isMrPrime<veryLongInt, longint>( veryLongInt(k + (longint)*it) ) ) goto FAILURE;
+
+    for ( int n = 0; n < limit; n += 10 ) {
+        if ( n % 3 == 0 || n % 7 == 0 ) continue;
+        for ( auto it = primes.begin(); it != primes.end(); ++it ) {
+            if ( *it > n ) break;
+            int p = *it;
+            long long int r = n % p; //multiplication may overflow int
+            for ( auto jt = additions.begin(); jt != additions.end(); ++jt ) {
+                if ( ( r * r + *jt ) % p == 0 ) goto CANDIDATE_FAILURE;
+            }
         }
-        for ( auto it = addToNonPrime.begin(); it != addToNonPrime.end(); ++it ) {
-            if ( isMrPrime<veryLongInt, longint>( veryLongInt(k + (longint)*it) ) ) goto FAILURE;
+        candidatePrimes.push_back( n );
+    CANDIDATE_FAILURE:;
+    }
+
+    for ( auto it = candidatePrimes.begin(); it != candidatePrimes.end(); ++it ) {
+        uLongInt n = *it;
+        for ( auto jt = additions.begin(); jt != additions.end(); ++jt ) {
+            uLongInt r = n * n + *jt;
+            //if ( !isPrime( r ) ) goto CHECK_FAILURE;
+            bool isPrime = isMrPrime< DoubleUInt<uLongInt>, uLongInt >( DoubleUInt<uLongInt>( r ) );
+            if ( !isPrime ) goto CHECK_FAILURE;
+        }
+        for ( auto jt = nonAdditions.begin(); jt != nonAdditions.end(); ++jt ) {
+            uLongInt r = n * n + *jt;
+            //if ( isPrime( r ) ) goto CHECK_FAILURE;
+            bool isPrime = isMrPrime< DoubleUInt<uLongInt>, uLongInt >( DoubleUInt<uLongInt>( r ) );
+            if ( isPrime ) goto CHECK_FAILURE;
         }
         std::cout << n << std::endl;
         sum += n;
-FAILURE:;
+    CHECK_FAILURE:;
     }
 
-    std::cout << "Answer: " << sum << std::endl;
+    std::cout << "Sum: " << sum << std::endl;
 
     auto endTime = std::chrono::steady_clock::now();
     auto runTime = endTime - startTime;

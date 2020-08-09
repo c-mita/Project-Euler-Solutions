@@ -34,6 +34,9 @@ $(BIN_DIR):
 $(BIN_DIR)/066: $(SRC_DIR)/066.cpp $(INC_DIR)/* $(DEP_DIR)/066.d | $(BIN_DIR) $(DEP_DIR)
 	$(CC) $(CFLAGS) $< -o $@ -lgmp
 
+$(BIN_DIR)/146: $(SRC_DIR)/146.cpp $(INC_DIR)/* $(DEP_DIR)/146.d | $(BIN_DIR) $(DEP_DIR)
+	$(CC) $(CFLAGS) $< -o $@
+
 $(BIN_DIR)/%: $(SRC_DIR)/%.cpp $(DEP_DIR)/%.d | $(BIN_DIR) $(DEP_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
@@ -79,10 +82,6 @@ clean:
 .PHONY: 134
 134: $(BIN_DIR)/134
 	$(BIN_DIR)/134
-
-.PHONY: 146_2
-146_2: $(BIN_DIR)/146_2
-	$(BIN_DIR)/146_2
 
 .PHONY: 146
 146: $(BIN_DIR)/146
